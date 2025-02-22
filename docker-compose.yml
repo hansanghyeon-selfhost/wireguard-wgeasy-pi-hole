@@ -1,0 +1,55 @@
+networks:
+  vpn:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
+
+services:
+  wg-easy:
+    environment:
+      - WG_HOST=${EXTERNAL_IP}
+      - PASSWORD_HASH=${PASSWORD_HASH}
+      # 💡 This is the Pi-Hole Container's IP Address
+      - WG_DEFAULT_DNS=10.0.0.3
+      - WG_DEFAULT_ADDRESS=10.0.0.x
+    image: ghcr.io/wg-easy/wg-easy
+    volumes:
+      - ./_v/wg-easy:/etc/wireguard
+    restart: unless-stopped
+    ports:
+      - "51820:51820/udp"
+      # webpage
+      # - "51821:51821/tcp"
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv4.ip_forward=1
+    dns:
+      - 10.0.0.3
+    networks:
+      vpn:
+        ipv4_address: 10.0.0.2
+
+  pihole:
+    image: pihole/pihole:2025.02.3
+    environment:
+      - PIHOLE_DOMAIN=host.docker.internal
+      - TZ=Asia/Seoul
+    volumes:
+      - './_v/pihole/etc-pihole:/etc/pihole'
+      - './_v/pihole/etc-dnsmasq.d:/etc/dnsmasq.d'
+    ports:
+      - 18080:80
+    cap_add:
+      - NET_ADMIN
+      - SYS_NICE     # 프로세스 우선순위 설정 권한
+      - SYS_TIME     # 시스템 시간 설정 권한
+    restart: unless-stopped
+    networks:
+      vpn:
+        ipv4_address: 10.0.0.3
+    # 아래 설정 추가
+    user: root  # 임시로 root 권한으로 실행

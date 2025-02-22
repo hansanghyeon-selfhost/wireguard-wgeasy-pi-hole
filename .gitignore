@@ -1,5 +1,4 @@
 .env
 wireguard/*
 !wireguard/.gitkeep
-.pihole
-.wg-easy
+_v

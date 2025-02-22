@@ -1,0 +1,15 @@
+networks:
+  traefik_proxy:
+    external: true
+
+services:
+  wg-easy:
+    networks:
+      - default
+      - traefik_proxy
+    labels:
+      # traefik
+      - traefik.enable=true
+      - traefik.http.routers.${SERVICE}.entrypoints=web,webs
+      - traefik.http.routers.${SERVICE}.rule=Host(`${DOMAIN}`)
+      - traefik.http.services.${SERVICE}.loadbalancer.server.port=${APP_PORT}
