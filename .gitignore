@@ -2,3 +2,5 @@
 wireguard/*
 !wireguard/.gitkeep
 _v
+.justfile*
+01-dockge
