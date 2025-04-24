@@ -3,13 +3,26 @@ networks:
     external: true
 
 services:
-  wg-easy:
+  # obsidian의 문서중에
+  # pi-hole@v6 + wgireguard 업그레이드
+  # 해당문서를 살펴보고올것. wg-easy에 traefik 적용하지 말기
+  #wg-easy:
+  #  networks:
+  #    - default
+  #    - traefik_proxy
+  #  labels:
+  #    # traefik
+  #    - traefik.enable=true
+  #    - traefik.http.routers.${SERVICE:-wg-easy}-webui.entrypoints=webs
+  #    - traefik.http.routers.${SERVICE:-wg-easy}-webui.rule=Host(`vpn.hyeon.pro`) || Host(`vpn2.hyeon.pro`)
+  #    - traefik.http.services.${SERVICE:-wg-easy}-webui.loadbalancer.server.port=${APP_PORT:-51821}
+  pihole:
     networks:
       - default
       - traefik_proxy
     labels:
       # traefik
       - traefik.enable=true
-      - traefik.http.routers.${SERVICE}.entrypoints=web,webs
-      - traefik.http.routers.${SERVICE}.rule=Host(`${DOMAIN}`)
-      - traefik.http.services.${SERVICE}.loadbalancer.server.port=${APP_PORT}
+      - traefik.http.routers.${SERVICE:-pihole}.entrypoints=reinternals
+      - traefik.http.routers.${SERVICE:-pihole}.rule=Host(`im.vpn.pi`) || Host(`im.vpn2.pi`)
+      - traefik.http.services.${SERVICE:-pihole}.loadbalancer.server.port=${APP_PORT:-80}
