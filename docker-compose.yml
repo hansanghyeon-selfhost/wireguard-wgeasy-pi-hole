@@ -7,7 +7,7 @@ networks:
 
 services:
   wg-easy:
-    image: ghcr.io/wg-easy/wg-easy
+    image: ghcr.io/wg-easy/wg-easy:14
     restart: unless-stopped
     privileged: true
     environment:
@@ -35,7 +35,7 @@ services:
     dns:
       - 10.8.1.2
   pihole:
-    image: pihole/pihole:2025.04.0
+    image: pihole/pihole:2025.11.1
     environment:
       - PIHOLE_DOMAIN=host.docker.internal
       - TZ=Asia/Seoul
@@ -43,6 +43,8 @@ services:
     volumes:
       - './_v/pihole/etc-pihole:/etc/pihole'
     ports:
+      - 53:53/tcp
+      - 53:53/udp
       - 18080:80
     restart: unless-stopped
     networks:
